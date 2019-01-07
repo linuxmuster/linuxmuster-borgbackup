@@ -1,0 +1,12 @@
+Source: linuxmuster-borgbackup
+Section: unknown
+Priority: extra
+Maintainer: Frank Schiebel <frank@linuxmuster.net>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.2
+Homepage: https://linuxmuster.net
+
+Package: linuxmuster-borgbackup
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Backup scripts to create backup sets with borg backup

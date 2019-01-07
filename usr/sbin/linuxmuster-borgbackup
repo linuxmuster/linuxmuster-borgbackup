@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# where are the config directorys located?
+CONFDIR=/etc/linuxmuster-borgbackup/
+
+# include the functionality
+. /var/lib/linuxmuster-borgbackup/functions || exit 1
+
+# get options
+while getopts 'a:g:s:f:k:hpqn' OPT; do
+  case $OPT in
+    a)  action=$OPTARG;;
+    f)  filter=$OPTARG;;
+    k)  klazi=$OPTARG;;
+    g)  groupkey=$OPTARG;;
+    s)  backupset=$OPTARG;;
+    h)  hlp="yes";;
+    p)  partition="yes";;
+    q)  quiet="yes";;
+    n)  WAITCMD="";;
+    *)  unknown="yes";;
+  esac
+done
+
+
+case $action in 
+"backup") 
+    getSets
+    runBackup
+;;
+"list") 
+    listBackups $backupset
+;;
+"listsets") 
+    getSets
+    echo "Configuration directory is $CONFDIR."
+    echo "Listing active backupsets:"
+    for s in $AllActiveSets; do 
+        echo $s
+    done
+;;
+"check") 
+    getRepoInfo $backupset
+    ;;
+*)
+    printHelp    
+    exit 1
+;;
+esac
+

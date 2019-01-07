@@ -1,0 +1,128 @@
+#
+# Functions for qgm-borgbackup
+# Frank Schiebel <frank@linuxmuster.net> 
+# GPLv3
+#
+
+# some helpers and error handling:
+info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
+trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
+
+function printHelp {
+    # usage
+    echo "
+        usage: $0 -a <action> [-s <backupset>]
+        
+        action:
+            backup:
+                Run backups. If a set is given with -s 
+                only for this set, else for all sets
+            list:
+                Show archive list for given backup set
+            listsets:  
+                Show all backupsets
+            check: 
+                Outputs the status for each backupset
+                in check_mk's local check format
+    "
+}
+
+
+# getSets
+# Get all backupsets to work on
+# as a space separated list
+function getSets () {
+    # get clean names of backup sets
+    AllActiveSets=""
+    if [ "x$backupset" != "x" ]; then   
+        # FIXME list of sets?
+        setSelection=${CONFDIR}/${backupset}/backup.conf
+    else 
+        setSelection=$(find ${CONFDIR} -name "backup.conf")
+    fi
+
+    for set in $setSelection; do 
+        
+        set=${set##${CONFDIR}}
+        set=${set%%/backup.conf}
+        set=${set%/}
+        set=${set#/}
+
+        . ${CONFDIR}/$set/backup.conf
+        # Skip if disabled
+        if [ "x${DISABLED}" == "xyes" ]; then 
+            echo "Config $set is disabled in config. Skipping."
+            continue
+        fi
+        AllActiveSets="${AllActiveSets} $set"
+    done
+}
+
+# runBackup
+# Make backup for all active sets
+function runBackup {
+    for set in $AllActiveSets; do 
+
+        # setting repository passphrase from config
+        export BORG_PASSPHRASE
+
+        info "Starting backup for $SETNAME"
+        info "Target is: $REPOSITORY"
+
+        # Run backup command
+        $BACKUPCOMMAND $REPOSITORY::'{hostname}-'${set}'-{now}' $SOURCEDIR
+    done
+}
+
+
+
+# this function iterates over the configurations
+# and lists the backups in the backup sets
+# optional: a configuration can be given to just list 
+# this backupset
+
+function listBackups() {
+    SINGLE=$1
+    if [ -f $CONFDIR/$SINGLE/backup.conf ]; then 
+        . /etc/qgm-borgbackup/$SINGLE/backup.conf
+        # setting repository passphrase from config
+        export BORG_PASSPHRASE
+        borg list $REPOSITORY
+        return
+    fi
+
+}
+
+
+function pruneBackups() {
+
+    for set in $AllActiveSets; do 
+
+        # setting repository passphrase from config
+        export BORG_PASSPHRASE
+
+        borg prune --list  \
+                    --show-rc                       \
+                    --keep-daily    $KEEP_DAILY     \
+                    --keep-weekly   $KEEP_WEEKLY    \
+                    --keep-monthly  $KEEP_MONTHLY   \
+                    --prefix '{hostname}-'${set}    \
+                    $REPOSITORY
+    done
+}
+
+function getRepoInfo() {
+    SINGLE=$1
+    if [ -f $CONFDIR/$SINGLE/backup.conf ]; then 
+        . /etc/qgm-borgbackup/$SINGLE/backup.conf
+        # setting repository passphrase from config
+        export BORG_PASSPHRASE
+        borg info $REPOSITORY
+    fi
+}
+
+#function checkBackups() {
+#    
+#
+#}
+

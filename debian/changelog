@@ -1,0 +1,25 @@
+linuxmuster-borgbackup (0.5) unstable; urgency=low
+
+  * refactoring: functions moved to var/lib/
+  * renaming: linuxmuster-borgbackup
+
+ -- Frank Schiebel <frank@linuxmuster.net>  Mon, 07 Jan 2019 9:27:00 +0100
+
+linuxmuster-borgbackup (0.3) unstable; urgency=low
+
+  * introduced common.conf
+
+ -- Frank Schiebel <frank@linuxmuster.net>  Sun, 06 Jan 2019 15:47:00 +0100
+
+linuxmuster-borgbackup (0.2) unstable; urgency=low
+
+  * refactored functionality to functions
+  * introduced options for controlling the script
+
+ -- Frank Schiebel <frank@linuxmuster.net>  Mon, 31 Dec 2018 15:47:00 +0100
+
+linuxmuster-borgbackup (0.1) unstable; urgency=low
+
+  * First version to start developement
+
+ -- Frank Schiebel <frank@linuxmuster.net>  Sun, 16 Dec 2018 15:36:00 +0100

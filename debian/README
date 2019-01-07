@@ -1,0 +1,6 @@
+The Debian Package linuxmuster-borgbackup
+-----------------------------------------------
+
+Script(s) to manage backups in linuxmuster with borgbackup
+
+ -- Frank Schiebel <frank@linuxmuster.net>  Thu, 07 Jan 2019 09:10:00 +0100
